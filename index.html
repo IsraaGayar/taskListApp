@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+            .container{
+                width:400px;
+                min-height: 300px;
+                background-color: blanchedalmond;
+                border: gray solid 2px;
+                border-radius: 4px;
+                position:absolute;
+                left: 50%;
+                top: 50%;
+                transform: translate(-50%,-50%);
+                padding: 10px;
+                z-index: 0;
+            }
+            .smallcontainer{
+                margin: auto;
+                margin-top: 20px;
+                padding: 10px;
+                display: block;
+                width: 80%; 
+            }
+            .tasklist{
+                        
+                border: gray solid 2px;
+                border-radius: 4px;
+                background-color: white;           
+                list-style: none; 
+                height: 55vh;
+                overflow: auto;
+            }
+            .task{
+                height: 40px;
+                line-height: 40px;
+                padding-left: 10px;
+                border-bottom:1px solid black;
+            }
+            .taskinfo{
+                display: inline-block;
+            }
+            .btncont{
+                float: right;
+            }
+            .taskbtn{
+ 
+            }
+            .inputfields{
+                display: block;
+                margin: auto;
+                margin-top: 5px;
+                height: 30px;
+                width: 70%;
+                padding: 5px;
+            }
+            .tasktitle{
+                text-align: center;
+                display: block;
+                margin: auto;
+            }
+            .taskdone{
+                background-color: rgba(172, 255, 47, 0.575);
+            }
+            .title{
+                padding-top: 10px;
+                color: slategrey;
+                font-size: 200%;
+                font-weight: 550;
+            }
+            .popupmsg{
+                width:450px;
+                height: 200px;
+                background-color: rgb(179, 247, 173);
+                border: gray solid 2px;
+                border-radius: 4px;
+                position:absolute;
+                left: 50%;
+                top: 50%;
+                transform: translate(-50%,-50%);
+                padding: 10px;
+                z-index: 2;
+                display: block;
+                
+            }
+            .nopopup{
+                display: none;
+            }
+            
+        </style>
+
+    </head>
+
+    <body>
+        <div class="container">
+            <span class="tasktitle title" >My tasks List</span>
+            <ul class="tasklist smallcontainer" id="tasklst">
+                <li class="task"> No tasks available, enter new task </li> 
+                <!-- <li class="task"  onclick="openTaskDetails();"> <div class="taskinfo"> dfcghbjndfghbjn </div> <div class="btncont"><button class="taskbtn"   >done</button>  <button class="taskbtn"  >delete</button></div></li>  -->
+                <!-- <li class="task"> Attend lec 2 <div class="btncont"> <button class="taskbtn">done</button>  <button class="taskbtn">delete</button></div></li> 
+                <li class="task"> Attend lec 2 <div class="btncont"> <button class="taskbtn">done</button>  <button class="taskbtn">delete</button></div></li> 
+                <li class="task"> Attend lec 2 <div class="btncont"><button class="taskbtn">done</button>  <button class="taskbtn">delete</button></div></li>  -->
+            </ul>
+       
+            <div class="smallcontainer">
+                <span class=" tasktitle"> The new Task </span>
+                <input class="inputfields" id="taskinput" type="text" onkeypress="enterpressed(event);" /> 
+                <button class="inputfields" onclick="addtask();"  >add</button>
+            </div>
+        </div>
+        <div class="nopopup" id="popup">
+
+            <h2>task title</h2>
+            <p>task conteeeeeeeeeent</p>
+            <button>done</button>
+            <button onclick="closepopup();">not now</button>
+            <button>delete</button>
+            
+        </div>
+
+
+        <script>
+
+            var tasks=[];
+
+            function addtask(){
+                //get the task (userinput) from the input field then set the input field to empty
+               var inputPlaceholder= document.getElementById("taskinput");
+               var currenttask = inputPlaceholder.value;
+               inputPlaceholder.value="";
+               // add the new task to array
+               var currenttaskObject={
+                        name: currenttask,
+                        done:false
+                    }
+                tasks.push(currenttaskObject);
+                displaytasks();
+            }
+
+            function displaytasks(){
+                var htmlarray= tasks.map(function(task){                   
+                    return '<li class="task"  ><div class="taskinfo" onclick="openTaskDetails(event);">'+ task.name +' </div><div class="btncont"><button class="taskbtn"  onclick="taskDone(\''+ task.name +'\',event);" >done</button>  <button class="taskbtn"  onclick="taskDelete(\''+ task.name +'\');">delete</button></div></li> '
+                });
+
+                var tasksHtmlCode=htmlarray.join("");
+                var listHtmlcodePlaceholder= document.getElementById("tasklst");
+                listHtmlcodePlaceholder.innerHTML=tasksHtmlCode;
+                if(tasks.length==0){
+                    listHtmlcodePlaceholder.innerHTML='<li class="task"> No tasks available, enter new task </li> ';
+                }
+            }
+
+            function taskDelete(mytext){
+                 //get the task that wants to be deleter
+                 var deletedTaskIndex =tasks.findIndex(function(element){  return element.name==mytext; });
+                 tasks.splice(deletedTaskIndex,1);
+                 displaytasks();
+            }
+      
+            function taskDone(mytext,e){
+                //get the task that was done
+                var currentdonetask =tasks.find(function(element){  return element.name==mytext;  });
+                //change its value
+                currentdonetask.done= !currentdonetask.done;
+                //check its state for editting the background color and button name
+                if(currentdonetask.done){
+                    e.target.parentNode.parentNode.classList.add("taskdone");
+                    e.target.innerHTML="Undo";
+                }else{
+                    e.target.parentNode.parentNode.classList.remove("taskdone");
+                    e.target.innerHTML="Done";
+                }
+            }
+
+            function openTaskDetails(e){
+                //e.target.parentNode.parentNode.classname="popupmsg";
+                document.getElementById("popup").className="popupmsg";
+                //alert("vgbnm");
+            }
+
+            function closepopup(){
+                document.getElementById("popup").className="nopopup";
+            }
+
+
+            function enterpressed(myevent){
+                // if the key pressed is enter, call the same function called by the add button
+                if(myevent.keyCode === 13) { addtask(); }
+            }
+
+
+        </script>
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <!-- <script>
+            var tasks=[];
+
+            function displaytasks(){
+
+                var htmlarray= tasks.map(function(item){
+                    return "<li class='task'>" +item+ " <button class='taskbtn'>done</button>  <button class='taskbtn'>delete</button></li>";
+                });
+                var htmlcode=htmlarray.join("");
+                var doccc= document.getElementById("tasklst");
+                doccc.innerHTML= htmlcode;
+
+            }
+
+            function add(){
+                var taskinput=document.getElementById("taskinput");
+                tasks.push(taskinput.value);
+                taskinput.value="";
+                displaytasks();
+            }
+        </script> -->
+
+    </body>
+</html>
